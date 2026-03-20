@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 type PreferenceFormData = {
   nickName: string
@@ -25,28 +25,24 @@ export const Route = createFileRoute('/form')({
 })
 
 function FormComponent() {
-  const [formData, setFormData] = useState<PreferenceFormData>(defaultFormData)
-  const [saved, setSaved] = useState(false)
-
-  useEffect(() => {
+  const [formData, setFormData] = useState<PreferenceFormData>(() => {
     const saved = localStorage.getItem(STORAGE_KEY)
-    if (!saved) {
-      return
-    }
-
+    if (!saved) return defaultFormData
     try {
       const parsed = JSON.parse(saved) as Partial<PreferenceFormData>
-      setFormData({
+      return {
         nickName: parsed.nickName ?? '',
         favoriteColor: parsed.favoriteColor ?? '',
         cityName: parsed.cityName ?? '',
         stateName: parsed.stateName ?? '',
         favoriteFood: parsed.favoriteFood ?? '',
-      })
+      }
     } catch {
       localStorage.removeItem(STORAGE_KEY)
+      return defaultFormData
     }
-  }, [])
+  })
+  const [saved, setSaved] = useState(false)
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target

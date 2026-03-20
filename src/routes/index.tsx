@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 type PreferenceFormData = {
   nickName: string
@@ -17,27 +17,23 @@ export const Route = createFileRoute('/')({
 })
 
 function LazyIndexComponent() {
-  const [preferences, setPreferences] = useState<PreferenceFormData | null>(null)
-
-  useEffect(() => {
+  const [preferences] = useState<PreferenceFormData | null>(() => {
     const saved = localStorage.getItem(STORAGE_KEY)
-    if (!saved) {
-      return
-    }
-
+    if (!saved) return null
     try {
       const parsed = JSON.parse(saved) as Partial<PreferenceFormData>
-      setPreferences({
+      return {
         nickName: parsed.nickName ?? '',
         favoriteColor: parsed.favoriteColor ?? '',
         cityName: parsed.cityName ?? '',
         stateName: parsed.stateName ?? '',
         favoriteFood: parsed.favoriteFood ?? '',
-      })
+      }
     } catch {
       localStorage.removeItem(STORAGE_KEY)
+      return null
     }
-  }, [])
+  })
 
   const preferenceItems = [
     { label: 'Nickname', value: preferences?.nickName ?? '' },
