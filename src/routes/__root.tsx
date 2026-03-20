@@ -4,40 +4,86 @@ import { TanStackRouterDevtools } from '@tanstack/router-devtools'
 // eslint-disable-next-line react-refresh/only-export-components
 export const Route = createRootRoute({
   component: () => (
-    <>
-      <div className="p-4 flex gap-4 bg-blue-50 border-b">
-        <Link
-          to="/"
-          activeProps={{
-            className: 'font-bold text-blue-600',
-          }}
-          className="text-blue-500 hover:text-blue-700"
-        >
-          🏠 Home
-        </Link>
-        <Link
-          to="/form"
-          activeProps={{
-            className: 'font-bold text-blue-600',
-          }}
-          className="text-blue-500 hover:text-blue-700"
-        >
-          📋 Formulário
-        </Link>
-        <Link
-          to="/about"
-          activeProps={{
-            className: 'font-bold text-blue-600',
-          }}
-          className="text-blue-500 hover:text-blue-700"
-        >
-          📖 About
-        </Link>
-      </div>
-      <main className="p-4">
+    <div className="app-shell">
+      <header className="app-header">
+        <div className="app-header-inner">
+          <Link to="/" className="app-brand">
+            Daylift
+          </Link>
+
+          <details className="app-mobile-menu">
+            <summary className="app-mobile-menu-trigger">
+              Menu
+            </summary>
+            <nav className="app-mobile-nav">
+              <Link
+                to="/"
+                className="app-mobile-nav-link"
+                activeProps={{ className: 'app-mobile-nav-link app-mobile-nav-link-active' }}
+              >
+                Home
+              </Link>
+              <Link
+                to="/form"
+                className="app-mobile-nav-link"
+                activeProps={{ className: 'app-mobile-nav-link app-mobile-nav-link-active' }}
+              >
+                My Preferences
+              </Link>
+              <Link
+                to="/about"
+                className="app-mobile-nav-link"
+                activeProps={{ className: 'app-mobile-nav-link app-mobile-nav-link-active' }}
+              >
+                About
+              </Link>
+            </nav>
+          </details>
+
+          <nav className="app-nav">
+            <Link
+              to="/"
+              className="app-nav-link"
+              activeProps={{ className: 'app-nav-link app-nav-link-active' }}
+            >
+              Home
+            </Link>
+            <Link
+              to="/form"
+              className="app-nav-link"
+              activeProps={{ className: 'app-nav-link app-nav-link-active' }}
+            >
+              My Preferenreces
+            </Link>
+            <Link
+              to="/about"
+              className="app-nav-link"
+              activeProps={{ className: 'app-nav-link app-nav-link-active' }}
+            >
+              About
+            </Link>
+          </nav>
+        </div>
+      </header>
+
+      <main className="app-main">
         <Outlet />
       </main>
+
+      <footer className="app-footer">
+        <div className="app-footer-inner">
+          <a
+            href="https://x.com/imfelquis"
+            target="_blank"
+            rel="noreferrer"
+            className="app-footer-link"
+          >
+            @imfelquis
+          </a>
+        </div>
+      </footer>
+
       <TanStackRouterDevtools />
-    </>
+    </div>
   ),
 })

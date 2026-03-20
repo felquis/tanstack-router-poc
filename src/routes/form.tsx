@@ -1,5 +1,23 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+
+type PreferenceFormData = {
+  nickName: string
+  favoriteColor: string
+  cityName: string
+  stateName: string
+  favoriteFood: string
+}
+
+const STORAGE_KEY = 'simple-things-preferences'
+
+const defaultFormData: PreferenceFormData = {
+  nickName: '',
+  favoriteColor: '',
+  cityName: '',
+  stateName: '',
+  favoriteFood: '',
+}
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const Route = createFileRoute('/form')({
@@ -7,145 +25,137 @@ export const Route = createFileRoute('/form')({
 })
 
 function FormComponent() {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    password: '',
-    gender: '',
-  })
+  const [formData, setFormData] = useState<PreferenceFormData>(defaultFormData)
+  const [saved, setSaved] = useState(false)
 
-  const [submitted, setSubmitted] = useState(false)
+  useEffect(() => {
+    const saved = localStorage.getItem(STORAGE_KEY)
+    if (!saved) {
+      return
+    }
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
+    try {
+      const parsed = JSON.parse(saved) as Partial<PreferenceFormData>
+      setFormData({
+        nickName: parsed.nickName ?? '',
+        favoriteColor: parsed.favoriteColor ?? '',
+        cityName: parsed.cityName ?? '',
+        stateName: parsed.stateName ?? '',
+        favoriteFood: parsed.favoriteFood ?? '',
+      })
+    } catch {
+      localStorage.removeItem(STORAGE_KEY)
+    }
+  }, [])
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
+    setSaved(false)
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }))
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    console.log('Form data submitted:', formData)
-    setSubmitted(true)
-    setTimeout(() => setSubmitted(false), 3000)
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(formData))
+    setSaved(true)
   }
 
   return (
-    <div className="max-w-md mx-auto p-6">
-      <h1 className="text-3xl font-bold text-blue-600 mb-2">📋 Formulário</h1>
-      <p className="text-gray-600 mb-6">
-        Experimento de transmissão segura de dados pessoais
+    <div className="form-page">
+      <h1 className="page-title">Simple Things</h1>
+      <p className="page-text form-intro-text">
+        Share small things that make your day better.
       </p>
 
-      {submitted && (
-        <div className="mb-4 p-4 bg-green-100 border border-green-400 rounded">
-          <p className="text-green-700 font-semibold">✅ Dados recebidos com sucesso!</p>
+      {saved && (
+        <div className="form-success-alert" role="status" aria-live="polite">
+          <p className="form-success-text">Preferences saved successfully.</p>
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label htmlFor="name" className="block text-sm font-semibold mb-1">
-            Nome
+      <form className="form-card" onSubmit={handleSubmit}>
+        <div className="form-field">
+          <label htmlFor="nickName" className="form-label">
+            What do your friends call you?
           </label>
           <input
             type="text"
-            id="name"
-            name="name"
-            value={formData.name}
+            id="nickName"
+            name="nickName"
+            value={formData.nickName}
             onChange={handleChange}
-            required
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Seu nome completo"
+            className="form-input"
+            placeholder="Your favorite nickname"
           />
         </div>
 
-        <div>
-          <label htmlFor="email" className="block text-sm font-semibold mb-1">
-            Email
+        <div className="form-field">
+          <label htmlFor="favoriteColor" className="form-label">
+            Which color lifts your mood?
           </label>
           <input
-            type="email"
-            id="email"
-            name="email"
-            value={formData.email}
+            type="text"
+            id="favoriteColor"
+            name="favoriteColor"
+            value={formData.favoriteColor}
             onChange={handleChange}
-            required
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="seu@email.com"
+            className="form-input"
+            placeholder="For example: sky blue"
           />
         </div>
 
-        <div>
-          <label htmlFor="phone" className="block text-sm font-semibold mb-1">
-            Telefone
+        <div className="form-field">
+          <label htmlFor="cityName" className="form-label">
+            Where do you feel most at home?
           </label>
           <input
-            type="tel"
-            id="phone"
-            name="phone"
-            value={formData.phone}
+            type="text"
+            id="cityName"
+            name="cityName"
+            value={formData.cityName}
             onChange={handleChange}
-            required
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="+55 (00) 00000-0000"
+            className="form-input"
+            placeholder="City name"
           />
         </div>
 
-        <div>
-          <label htmlFor="password" className="block text-sm font-semibold mb-1">
-            Senha
+        <div className="form-field">
+          <label htmlFor="stateName" className="form-label">
+            What state is that in?
           </label>
           <input
-            type="password"
-            id="password"
-            name="password"
-            value={formData.password}
+            type="text"
+            id="stateName"
+            name="stateName"
+            value={formData.stateName}
             onChange={handleChange}
-            required
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Digite uma senha forte"
+            className="form-input"
+            placeholder="State name"
           />
         </div>
 
-        <div>
-          <label htmlFor="gender" className="block text-sm font-semibold mb-1">
-            Sexo
+        <div className="form-field">
+          <label htmlFor="favoriteFood" className="form-label">
+            What food always makes your day better?
           </label>
-          <select
-            id="gender"
-            name="gender"
-            value={formData.gender}
+          <input
+            type="text"
+            id="favoriteFood"
+            name="favoriteFood"
+            value={formData.favoriteFood}
             onChange={handleChange}
-            required
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="">Selecione uma opção</option>
-            <option value="masculino">Masculino</option>
-            <option value="feminino">Feminino</option>
-            <option value="outro">Outro</option>
-          </select>
+            className="form-input"
+            placeholder="Your comfort food"
+          />
         </div>
 
-        <button
-          type="submit"
-          className="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700 transition"
-        >
-          Enviar
+        <button type="submit" className="form-submit-button">
+          Save answers
         </button>
       </form>
-
-      <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded">
-        <p className="text-sm text-gray-700">
-          <strong>🔒 Nota de segurança:</strong> Neste experimento, os dados são
-          armazenados apenas localmente no navegador (localStorage). Em produção,
-          use HTTPS, criptografia end-to-end e nunca transmita senhas em texto plano.
-        </p>
-      </div>
     </div>
   )
 }
